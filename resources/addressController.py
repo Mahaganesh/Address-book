@@ -92,7 +92,7 @@ def cal_two_cordinates(cordinates: schemas.Cal_two_cordinates, db: Session = Dep
     try:
         calculated_distance = distance_calculator(cordinates.latitude1, cordinates.longtitude1, cordinates.latitude2, cordinates.longtitude2)
         data = {
-            'distance' : calculated_distance
+            'distance' : '{} Km'.format(calculated_distance)
         }
         return HTTPException(status_code=200, detail=data)
     except:
