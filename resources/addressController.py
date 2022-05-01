@@ -15,7 +15,7 @@ from resources.utils import distance_calculator
 router = APIRouter()
 
 
-@router.post('/address-create/')
+@router.post('/address-create/', summary="Create Address with coordinates")
 def address_create(address: schemas.Address ,db: Session = Depends(get_db)):
     db_address = db.query(models.Address).filter(models.Address.latitude == address.latitude, models.Address.longitude == address.longtitude, models.Address.is_deleted == False).first()
     if db_address:
@@ -34,13 +34,13 @@ def address_create(address: schemas.Address ,db: Session = Depends(get_db)):
     db.refresh(db_address)
     return HTTPException(status_code=200, detail=db_address)
 
-@router.get('/address/all')
+@router.get('/address/all', summary='Retrieves all the address from the database')
 def get_all_address(db: Session = Depends(get_db)):
     db_address = db.query(models.Address).filter(models.Address.is_deleted == False).all()
     return HTTPException(status_code=200, detail=db_address)
 
-@router.patch('/address/{address_uuid}')
-def get_all_address(address_uuid: str ,address: schemas.Address ,db: Session = Depends(get_db)):
+@router.patch('/address/{address_uuid}', summary='Retrieves a particular address with the given Address UUID')
+def update_address(address_uuid: str ,address: schemas.Address ,db: Session = Depends(get_db)):
     db_address = db.query(models.Address).filter(models.Address.uuid == address_uuid, models.Address.is_deleted == False).first()
     if db_address:
         db_address.name = address.name
@@ -56,7 +56,7 @@ def get_all_address(address_uuid: str ,address: schemas.Address ,db: Session = D
     else:
         return HTTPException(status_code = 400, detail = "Address not found")
 
-@router.delete('/address/{address_uuid}')
+@router.delete('/address/{address_uuid}', summary='Deletes address with the given Address UUID')
 def delete_address(address_uuid: str ,db: Session = Depends(get_db)):
     db_address = db.query(models.Address).filter(models.Address.uuid == address_uuid, models.Address.is_deleted == False).first()
     if db_address:
@@ -68,7 +68,7 @@ def delete_address(address_uuid: str ,db: Session = Depends(get_db)):
         return {'message' : 'Address Not Found'}
 
 
-@router.post('/address/distance-calculator/', summary="")
+@router.post('/address/distance-calculator/', summary="Gets all the addresses from the given distance and coordinates")
 def distance_cal(cordinates: schemas.Cordinates, db: Session = Depends(get_db)):
     db_address = db.query(models.Address).filter(models.Address.is_deleted == False).all()
     data = []
@@ -87,7 +87,7 @@ def distance_cal(cordinates: schemas.Cordinates, db: Session = Depends(get_db)):
             data.append(distance)
     return HTTPException(status_code=200, detail=data)
 
-@router.post('/address/cal-distance-btw-two-cordinates/')
+@router.post('/address/cal-distance-btw-two-cordinates/', summary='Calculates the distance two coordinates')
 def cal_two_cordinates(cordinates: schemas.Cal_two_cordinates, db: Session = Depends(get_db)):
     try:
         calculated_distance = distance_calculator(cordinates.latitude1, cordinates.longtitude1, cordinates.latitude2, cordinates.longtitude2)
